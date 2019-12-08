@@ -27,6 +27,27 @@ router.get('/api/articles', (req, res) => {
 * URI:          /api/articles/5d664b8b68b4f5092aba18e9
 * Description:  Get An Article by Article ID
 */
+router.get('api/articles/:id', (req, res) => {
+  Fruit.findById(req.params.id, (error, articles) => {
+      if (!error) {
+          // return fruit if exist
+          if (articles) {
+              res.status(200).json({ articles: articles });
+          } else {
+              // if there is no fruit with a matching id
+              res.status(404).json({
+                  error: {
+                      name: 'DocumentNotFoundError',
+                      message: 'The provided id doesn\'t match any document'
+                  }
+              })
+          }
+      } else {
+          res.status(500).json({ error: error });
+      }
+  })
+});
+
 /**
  * Action:      CREATE
  * Method:      POST
@@ -51,8 +72,30 @@ router.post('/api/articles', (req, res) => {
 * URI:          /api/articles/5d664b8b68b4f5092aba18e9
 * Description:  Update An Article by Article ID
  */
-
-
+router.patch('api/articles/:id', (req, res) => {
+  Article.findById(req.params.id, (error, articles) => {
+      if (!error) {
+          if (articles) {
+            articles.update(req.body, (error, articles) => {
+                  if (!error) {
+                      res.status(204).end();
+                  } else {
+                      res.status(500).json({ error: error })
+                  }
+              })
+          } else {
+              res.status(404).json({
+                  error: {
+                      name: 'DocumentNotFoundError',
+                      message: 'The provided id doesn\'t match any document'
+                  }
+              })
+          }
+      } else {
+          res.status(500).json({ error: error })
+      }
+  })
+});
 
 /**
  * Action:      DESTROY
